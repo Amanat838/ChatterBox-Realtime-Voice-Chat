@@ -2,8 +2,12 @@ const otpService = require("../services/otp-service");
 const hashService = require("../services/hash-service");
 const userService = require("../services/user-service");
 const tokenService = require('../services/token-service')
+const UserDto = require('../dtos/user-dto');
 
 class AuthController {
+
+
+
   async sendOtp(req, res) {
     const { phone } = req.body;
     if (!phone) {
@@ -19,16 +23,21 @@ class AuthController {
 
     //Send OTP
     try {
-      await otpService.sendBySms(phone, otp);
+      // await otpService.sendBySms(phone, otp);
       res.json({
         hash: `${hash}-${expires}`,
         phone,
+        otp
       });
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: "Message sending failed" });
     }
   }
+
+
+
+
 
   async verifyOtp(req, res) {
     const { otp, hash, phone } = req.body;
@@ -63,12 +72,23 @@ class AuthController {
     //Token
     const {accessToken, refreshToken} = tokenService.generateTokens({_id: user._id, activated: false})
 
+
+    await tokenService.storeRefreshToken(refreshToken, user._id)
+
+
+    //Store tokens in cookies to make them more secure
     res.cookie('refreshToken', refreshToken, {
         maxAge: 1000 * 60 * 60 * 24 * 30,
         httpOnly: true
     })
+    res.cookie('accessToken', accessToken, {
+        maxAge: 1000 * 60 * 60 * 24 * 30,
+        httpOnly: true
+    })
 
-    res.json({accessToken})
+
+    const userDto = new UserDto(user)
+    res.json({user: userDto, auth: true})
   }
 }
 
