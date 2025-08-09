@@ -1,4 +1,4 @@
-const { Jimp } = require("jimp");
+const Jimp = require("jimp");
 const path = require("path");
 const userService = require("../services/user-service");
 const UserDto = require("../dtos/user-dto");
@@ -16,18 +16,9 @@ class ActivateController {
     const imagePath = `${Date.now()}-${Math.round(Math.random() * 1e9)}.png`;
 
     try {
-      console.log("Base64 length:", avatar.length);
-      console.log(
-        "Buffer length:",
-        Buffer.from(avatar.replace(/^data:image\/\w+;base64,/, ""), "base64")
-          .length
-      );
-      
       const jimpRes = await Jimp.read(buffer);
-      jimpRes.resize({
-          w: 150, // width
-          h: Jimp.AUTO, // or just `null` if AUTO is undefined
-        })
+      jimpRes
+        .resize(150, Jimp.AUTO)
         .write(path.resolve(__dirname, `../storage/${imagePath}`)); //We are using jimp to resize the image, bcz user can upload an image of large size.
     } catch (error) {
       console.error("Jimp error:", error);
