@@ -12,14 +12,16 @@ import Authenticate from "./pages/Authenticate";
 import Activate from "./pages/Activate";
 import Rooms from "./pages/Rooms";
 import { useSelector } from "react-redux";
-
-// const isAuth = false;
-// const user = {
-//   activated: false,
-// };
+import { useState } from "react";
+import { useLoadingWithRefresh } from "./hooks/useLoadingWithRefresh";
+import Loader from "./components/shared/Loader/Loader";
 
 function App() {
-  return (
+  const { loading } = useLoadingWithRefresh();
+  // return <Loader message={'Loading, please wait...'}/>
+  return loading ? (
+    "Loading..."
+  ) : (
     <>
       <div className="px-30">
         <BrowserRouter>

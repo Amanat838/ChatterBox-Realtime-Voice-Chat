@@ -136,9 +136,22 @@ class AuthController {
       httpOnly: true,
     });
 
-   //Response to client
+    //Response to client
     const userDto = new UserDto(user);
     res.json({ user: userDto, auth: true });
+  }
+
+  async logout(req, res) {
+    try {
+      const { refreshToken } = req.cookies;
+      //Delete refresh token from DB
+      await tokenService.removeToken(refreshToken);
+      //Delete cookies
+      res.clearCookie('refreshToken')
+      res.clearCookie('accessToken')
+
+      res.json({user: null, auth: false})
+    } catch (error) {}
   }
 }
 
